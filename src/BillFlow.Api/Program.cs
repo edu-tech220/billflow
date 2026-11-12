@@ -3,6 +3,7 @@ using BillFlow.Api.Auth;
 using BillFlow.Api.Data;
 using BillFlow.Api.Middleware;
 using BillFlow.Api.Services;
+using BillFlow.Api.Workers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +26,11 @@ builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IDunningSweeper, DunningSweepService>();
+
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddHostedService<DunningBackgroundWorker>();
+}
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 builder.Services
