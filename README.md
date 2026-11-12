@@ -38,6 +38,16 @@ double-charge prevention) handled correctly under concurrency instead of hand-wa
   off as `Uncollectible` and the subscription is canceled. A background worker sweeps for due
   renewals and due retries every few minutes; admins can also trigger the same sweep by hand.
 
+## Project structure
+
+```
+src/
+  BillFlow.Api/      Web API — domain, EF Core, services, controllers, the dunning worker
+  BillFlow.Web/       Razor Pages frontend — no database access, calls the API over HTTP
+tests/
+  BillFlow.Api.Tests/ xUnit: pure-logic, service-level (SQLite) and WebApplicationFactory tests
+```
+
 ## Architecture
 
 ```mermaid
