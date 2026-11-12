@@ -1,4 +1,5 @@
 using BillFlow.Api.Data;
+using BillFlow.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BillFlowDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddSingleton<IClock, SystemClock>();
+builder.Services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
+builder.Services.AddScoped<IInvoiceNumberGenerator, InvoiceNumberGenerator>();
+builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 
 var app = builder.Build();
 
