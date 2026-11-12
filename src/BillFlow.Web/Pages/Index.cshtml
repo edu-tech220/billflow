@@ -1,10 +1,38 @@
-﻿@page
-@model IndexModel
+@page
+@model BillFlow.Web.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Plans";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>Subscription plans</h1>
+<p class="muted">Pick a plan to start a subscription. Changing plans later prorates the difference automatically.</p>
+
+<div class="card-grid">
+    @foreach (var plan in Model.Plans)
+    {
+        <div class="card">
+            <h3>@plan.Name</h3>
+            <p class="price">$@plan.MonthlyPrice.ToString("0.00")<span class="muted">/mo</span></p>
+            @if (plan.TrialDays > 0)
+            {
+                <p class="muted">@plan.TrialDays-day free trial</p>
+            }
+            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+            {
+                <form method="post" asp-page-handler="Subscribe">
+                    <input type="hidden" name="planId" value="@plan.Id" />
+                    <button type="submit" class="btn">Subscribe</button>
+                </form>
+            }
+            else if (User.Identity?.IsAuthenticated != true)
+            {
+                <a class="btn" asp-page="/Register">Sign up</a>
+            }
+        </div>
+    }
 </div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
