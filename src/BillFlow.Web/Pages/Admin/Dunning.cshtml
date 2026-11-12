@@ -1,0 +1,27 @@
+@page
+@model BillFlow.Web.Pages.Admin.DunningModel
+@{
+    ViewData["Title"] = "Admin · Dunning";
+}
+
+<h1>Dunning sweep</h1>
+<p class="muted">
+    Runs the same sweep the background worker performs every few minutes: subscriptions whose
+    period just ended are renewed, and open invoices whose retry date has arrived get another
+    collection attempt.
+</p>
+
+@if (Model.Result is not null)
+{
+    <div class="alert alert-success">
+        Processed @Model.Result.RenewalsProcessed renewal(s) and @Model.Result.PaymentRetriesProcessed payment retry(ies).
+    </div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form method="post">
+    <button type="submit" class="btn">Run sweep now</button>
+</form>

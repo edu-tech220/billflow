@@ -1,0 +1,48 @@
+@page
+@model BillFlow.Web.Pages.Admin.CustomersModel
+@{
+    ViewData["Title"] = "Admin · Customers";
+}
+
+<h1>Customers</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Credit balance</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model.Customers)
+        {
+            <tr>
+                <td>@customer.Id</td>
+                <td>@customer.Name</td>
+                <td>@customer.Email</td>
+                <td>@customer.Role</td>
+                <td>$@customer.CreditBalance.ToString("0.00")</td>
+                <td>@customer.CreatedAt.ToString("MMM d, yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="muted" style="margin-top: 1rem;">
+    Page @Model.CurrentPage of @Model.TotalPages (@Model.TotalCount total)
+</div>
+
+<div style="margin-top: 0.75rem;">
+    @if (Model.CurrentPage > 1)
+    {
+        <a class="btn btn-secondary" asp-page="/Admin/Customers" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+    }
+    @if (Model.CurrentPage < Model.TotalPages)
+    {
+        <a class="btn btn-secondary" asp-page="/Admin/Customers" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+    }
+</div>
