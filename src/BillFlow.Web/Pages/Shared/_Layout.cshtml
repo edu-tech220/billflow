@@ -8,8 +8,30 @@
 </head>
 <body>
     <header class="site-header">
-        <nav class="navbar">
-            <a class="navbar-brand" asp-area="" asp-page="/Index">BillFlow</a>
+        <nav class="navbar container">
+            <a class="navbar-brand" asp-page="/Index">BillFlow</a>
+            <div class="nav-links">
+                <a asp-page="/Index">Plans</a>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-page="/Dashboard">Dashboard</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-page="/Admin/Plans">Admin: Plans</a>
+                        <a asp-page="/Admin/Customers">Admin: Customers</a>
+                        <a asp-page="/Admin/Dunning">Admin: Dunning</a>
+                    }
+                    <span class="nav-user">@User.Identity.Name</span>
+                    <form method="post" asp-page="/Logout" class="inline-form">
+                        <button type="submit" class="link-button">Log out</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-page="/Login">Log in</a>
+                    <a asp-page="/Register">Register</a>
+                }
+            </div>
         </nav>
     </header>
     <main class="container">

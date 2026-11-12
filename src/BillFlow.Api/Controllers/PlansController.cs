@@ -21,10 +21,16 @@ public class PlansController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IReadOnlyList<PlanDto>>> GetActivePlans(CancellationToken ct)
+    public async Task<ActionResult<IReadOnlyList<PlanDto>>> GetPlans(CancellationToken ct)
     {
-        var plans = await _db.Plans
-            .Where(p => p.IsActive)
+        var isAdmin = User.IsInRole(nameof(CustomerRole.Admin));
+        var query = _db.Plans.AsQueryable();
+        if (!isAdmin)
+        {
+            query = query.Where(p => p.IsActive);
+        }
+
+        var plans = await query
             .OrderBy(p => p.MonthlyPrice)
             .Select(p => ToDto(p))
             .ToListAsync(ct);
@@ -54,7 +60,7 @@ public class PlansController : ControllerBase
         _db.Plans.Add(plan);
         await _db.SaveChangesAsync(ct);
 
-        return CreatedAtAction(nameof(GetActivePlans), null, ToDto(plan));
+        return CreatedAtAction(nameof(GetPlans), null, ToDto(plan));
     }
 
     [HttpPut("{id:int}")]

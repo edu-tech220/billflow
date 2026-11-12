@@ -1,0 +1,113 @@
+@page
+@model BillFlow.Web.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1>Your subscription</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-success">@Model.StatusMessage</div>
+}
+
+@if (Model.Subscription is null)
+{
+    <div class="card">
+        <p>You don't have a subscription yet.</p>
+        <a class="btn" asp-page="/Index">Browse plans</a>
+    </div>
+}
+else
+{
+    var sub = Model.Subscription;
+    <div class="card">
+        <h3>@sub.PlanName <span class="badge @Model.StatusBadgeClass">@sub.Status</span></h3>
+        <p class="muted">
+            Current period: @sub.CurrentPeriodStart.ToString("MMM d, yyyy") &ndash; @sub.CurrentPeriodEnd.ToString("MMM d, yyyy")
+            @if (sub.TrialEndsAt is not null)
+            {
+                <text> (trial ends @sub.TrialEndsAt.Value.ToString("MMM d, yyyy"))</text>
+            }
+        </p>
+        @if (sub.CancelAtPeriodEnd)
+        {
+            <p class="muted">Cancels at the end of the current period.</p>
+        }
+
+        @if (sub.Status is "Active")
+        {
+            <form method="post" asp-page-handler="ChangePlan" style="margin-top:1rem;">
+                <div class="form-group" style="max-width: 280px;">
+                    <label for="newPlanId">Change plan</label>
+                    <select name="newPlanId" id="newPlanId">
+                        @foreach (var plan in Model.Plans)
+                        {
+                            <option value="@plan.Id" selected="@(plan.Code == sub.PlanCode ? "selected" : null)">@plan.Name ($@plan.MonthlyPrice.ToString("0.00")/mo)</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Change plan</button>
+            </form>
+        }
+
+        @if (sub.Status is "Trialing" or "Active" or "PastDue")
+        {
+            <form method="post" asp-page-handler="Cancel" style="margin-top:0.75rem;">
+                <input type="hidden" name="atPeriodEnd" value="true" />
+                <button type="submit" class="btn btn-secondary">Cancel at period end</button>
+            </form>
+            <form method="post" asp-page-handler="Cancel" style="margin-top:0.5rem;">
+                <input type="hidden" name="atPeriodEnd" value="false" />
+                <button type="submit" class="btn btn-danger">Cancel immediately</button>
+            </form>
+        }
+    </div>
+}
+
+<h2>Invoices</h2>
+@if (Model.Invoices.Count == 0)
+{
+    <p class="muted">No invoices yet.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Issued</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var invoice in Model.Invoices)
+            {
+                <tr>
+                    <td>@invoice.Number</td>
+                    <td>@invoice.Type</td>
+                    <td>$@invoice.Amount.ToString("0.00")</td>
+                    <td><span class="badge @Model.InvoiceBadgeClass(invoice.Status)">@invoice.Status</span></td>
+                    <td>@invoice.IssuedAt.ToString("MMM d, yyyy")</td>
+                    <td>
+                        @if (invoice.Status == "Open")
+                        {
+                            <form method="post" asp-page-handler="Pay">
+                                <input type="hidden" name="invoiceId" value="@invoice.Id" />
+                                <input type="hidden" name="attemptCount" value="@invoice.AttemptCount" />
+                                <button type="submit" class="btn">Pay now</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
