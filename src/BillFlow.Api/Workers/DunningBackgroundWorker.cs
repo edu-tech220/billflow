@@ -17,7 +17,7 @@ public class DunningBackgroundWorker : BackgroundService
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
-        _interval = TimeSpan.FromMinutes(config.GetValue("Dunning:SweepIntervalMinutes", 5));
+        _interval = TimeSpan.FromMinutes(config.GetValue("Dunning:SweepIntervalMinutes", 5d));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
