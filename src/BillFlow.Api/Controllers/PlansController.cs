@@ -31,11 +31,11 @@ public class PlansController : ControllerBase
         }
 
         var plans = await query
-            .OrderBy(p => p.MonthlyPrice)
             .Select(p => ToDto(p))
             .ToListAsync(ct);
 
-        return Ok(plans);
+        // Ordered client-side: SQLite (used in tests) can't translate ORDER BY on a decimal column.
+        return Ok(plans.OrderBy(p => p.MonthlyPrice));
     }
 
     [HttpPost]
