@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BillFlow</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar">
+            <a class="navbar-brand" asp-area="" asp-page="/Index">BillFlow</a>
+        </nav>
+    </header>
+    <main class="container">
+        @RenderBody()
+    </main>
+    <footer class="site-footer">
+        <div class="container">&copy; 2026 - BillFlow</div>
+    </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
